@@ -1,0 +1,143 @@
+import java.util.Scanner;
+
+public class development {
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+       
+        // 1. Hello World
+        System.out.println("\n--- 1. Print Hello ---");
+        System.out.println("Hello, World!");
+
+
+        // 2. Temperature Converter 
+        System.out.println("\n Temperature Converter");
+        System.out.print("Enter temperature in Celsius: ");
+        double celsius = scanner.nextDouble();
+        double fahrenheit = (celsius * 9 / 5) + 32;
+        System.out.println(celsius + " Celsius = " + fahrenheit + " Fahrenheit");
+
+
+        // 3. Even/Odd Checker 
+        System.out.println("\n--- 3. Even/Odd Checker ---");
+        System.out.print("Enter an integer: ");
+        int num = scanner.nextInt();
+        if (num % 2 == 0) {
+            System.out.println(num + " is Even");
+        } else {
+            System.out.println(num + " is Odd");
+        }
+
+
+        // 4. Multiplication Table 
+        System.out.println("\n--- 4. Multiplication For Loop ---");
+        System.out.print("Enter a number for its table: ");
+        int tableNum = scanner.nextInt();
+        for (int i = 1; i <= 10; i++) {
+            System.out.println(tableNum + " x " + i + " = " + (tableNum * i));
+        }
+
+
+        // 5. Digit Counter 
+        System.out.println("\n--- 5. Digit Counter ---");
+        System.out.print("Enter a positive integer: ");
+        int digitNum = scanner.nextInt();
+        int originalDigitNum = digitNum;
+        int count = 0;
+        
+        if (digitNum == 0) {
+            count = 1;
+        } else {
+            while (digitNum > 0) {
+                digitNum = digitNum / 10; 
+                count++;
+            }
+        }
+        System.out.println(originalDigitNum + " has " + count + " digits");
+
+
+        // 6. Fibonacci 
+        System.out.println("\n--- 6. Fibonacci Series ---");
+        System.out.print("Enter number of terms: ");
+        int terms = scanner.nextInt();
+        int a = 0;
+        int b = 1;
+        System.out.print("Fibonacci Series: ");
+        for (int i = 1; i <= terms; i++) {
+            System.out.print(a + " ");
+            
+            int next = a + b; 
+            a = b; 
+            b = next;
+        }
+        System.out.println();
+
+
+        // 7. Prime Number Checker
+        System.out.println("\n--- 7. Prime Number Checker ---");
+        System.out.print("Enter a number: ");
+        int primeNum = scanner.nextInt();
+        boolean isPrime = true;
+
+        if (primeNum <= 1) {
+            isPrime = false;
+        } else {
+            for (int i = 2; i < primeNum; i++) {
+                if (primeNum % i == 0) {
+                    isPrime = false; 
+                    break;
+                }
+            }
+        }
+        if (isPrime) {
+            System.out.println(primeNum + " is a Prime number");
+        } else {
+            System.out.println(primeNum + " is NOT a Prime number");
+        }
+
+
+        // 8. Day Finder 
+        System.out.println("\n--- 8. Day Finder ---");
+        System.out.print("Enter a day number (1-7): ");
+        int day = scanner.nextInt();
+        switch (day) {
+            case 1: System.out.println("Monday"); break;
+            case 2: System.out.println("Tuesday"); break;
+            case 3: System.out.println("Wednesday"); break;
+            case 4: System.out.println("Thursday"); break;
+            case 5: System.out.println("Friday"); break;
+            case 6: System.out.println("Saturday"); break;
+            case 7: System.out.println("Sunday"); break;
+            default: System.out.println("Invalid day number!"); break;
+        }
+
+
+        // 9. Array Operation (
+        System.out.println("\n-. Array Operation -");
+        int[] numbers = new int[5];
+        int sum = 0;
+        System.out.println("Enter 5 integers for the array:");
+        for (int i = 0; i < 5; i++) {
+            System.out.print("Enter element " + (i + 1) + ": ");
+            numbers[i] = scanner.nextInt();
+            sum = sum + numbers[i]; 
+        }
+        System.out.println("Sum of array elements = " + sum);
+
+
+        // 10. Circle Operation
+        System.out.println("\n--- 10. Circle Operation ---");
+        System.out.print("Enter the radius of the circle: ");
+        double radius = scanner.nextDouble();
+        double area = 3.14159 * radius * radius;
+        double circumference = 2 * 3.14159 * radius;
+        System.out.println("Area = " + area);
+        System.out.println("Circumference = " + circumference);
+
+
+        scanner.close();
+        System.out.println("\n PROGRAM ENDED");
+    }
+}
+
+    
