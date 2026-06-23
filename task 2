@@ -1,0 +1,156 @@
+public class servelet {
+    import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+class Contact {
+    private String name;
+    private String phone;
+    private String email;
+
+    public Contact(String name, String phone, String email) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public String getName() { return name; }
+    public String getPhone() { return phone; }
+    public String getEmail() { return email; }
+}
+
+@WebServlet("/contacts")
+public class ContactManagerServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    
+    // Server-side in-memory list to act as a database for contacts
+    private List<Contact> contactList = new ArrayList<>();
+
+    // Regular expressions for server-side validation
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z\\s]{2,50}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{10}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        // Render the page with an empty error message initially
+        renderPage(response, "");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // 1. Retrieve parameters from the form inputs
+        String name = request.getParameter("name").trim();
+        String phone = request.getParameter("phone").trim();
+        String email = request.getParameter("email").trim();
+
+        String errorMessage = "";
+
+        // 2. Server-side Validation
+        if (!NAME_PATTERN.matcher(name).matches()) {
+            errorMessage = "Invalid Name! Only letters and spaces allowed (2-50 characters).";
+        } else if (!PHONE_PATTERN.matcher(phone).matches()) {
+            errorMessage = "Invalid Phone Number! Must be exactly 10 digits.";
+        } else if (!EMAIL_PATTERN.matcher(email).matches()) {
+            errorMessage = "Invalid Email Address format!";
+        } else {
+            // 3. Check for duplicates in the server list
+            boolean isDuplicate = false;
+            for (Contact c : contactList) {
+                if (c.getPhone().equals(phone) || c.getEmail().equalsIgnoreCase(email)) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+
+            if (isDuplicate) {
+                errorMessage = "Error: A contact with this Phone or Email already exists!";
+            } else {
+               
+                contactList.add(new Contact(name, phone, email));
+            }
+        }
+
+      
+        renderPage(response, errorMessage);
+    }
+
+    
+    private void renderPage(HttpServletResponse response, String errorMessage) throws IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<html>");
+        out.println("<head><title>CRUD Contact Manager</title></head>");
+        out.println("<body style='font-family: Arial, sans-serif; margin: 40px;'>");
+
+        out.println("<h2>📞 Contact Manager (CRUD Module)</h2>");
+
+        
+        if (!errorMessage.isEmpty()) {
+            out.println("<div style='color: red; background-color: #ffe6e6; padding: 10px; "
+                    + "border: 1px solid red; border-radius: 5px; margin-bottom: 20px;'>");
+            out.println("<b>" + errorMessage + "</b>");
+            out.println("</div>");
+        } else if (contactList.size() > 0 && errorMessage.isEmpty()) {
+            out.println("<div style='color: green; background-color: #e6ffe6; padding: 10px; "
+                    + "border: 1px solid green; border-radius: 5px; margin-bottom: 20px;'>");
+            out.println("<b>Contact added successfully!</b>");
+            out.println("</div>");
+        }
+
+       
+        out.println("<div style='background: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px;'>");
+        out.println("<h3>Add New Contact</h3>");
+        out.println("<form action='contacts' method='POST'>");
+        out.println("   <label>Name:</label><br>");
+        out.println("   <input type='text' name='name' required style='width:100%; padding:5px;'><br><br>");
+        out.println("   <label>Phone (10 digits):</label><br>");
+        out.println("   <input type='text' name='phone' required style='width:100%; padding:5px;'><br><br>");
+        out.println("   <label>Email:</label><br>");
+        out.println("   <input type='email' name='email' required style='width:100%; padding:5px;'><br><br>");
+        out.println("   <input type='submit' value='Save Contact' style='background:blue; color:white; padding:10px 15px; border:none; border-radius:4px; cursor:pointer;'>");
+        out.println("</form>");
+        out.println("</div>");
+
+        out.println("<br><hr><br>");
+
+        out.println("<h3>All Saved Contacts</h3>");
+        if (contactList.isEmpty()) {
+            out.println("<p style='color: gray;'>No contacts found. Please add a contact using the form above.</p>");
+        } else {
+            out.println("<table border='1' cellpadding='8' cellspacing='0' style='width: 80%; border-collapse: collapse; text-align: left;'>");
+            out.println("   <tr style='background-color: #ddd;'>");
+            out.println("       <th>Name</th>");
+            out.println("       <th>Phone</th>");
+            out.println("       <th>Email</th>");
+            out.println("   </tr>");
+
+            
+            for (Contact contact : contactList) {
+                out.println("   <tr>");
+                out.println("       <td>" + contact.getName() + "</td>");
+                out.println("       <td>" + contact.getPhone() + "</td>");
+                out.println("       <td>" + contact.getEmail() + "</td>");
+                out.println("   </tr>");
+            }
+            out.println("</table>");
+        }
+
+        out.println("</body>");
+        out.println("</html>");
+    }
+}
+
+}
