@@ -1,0 +1,66 @@
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE, -- Validation: Prevents duplicate emails
+    hire_date DATE NOT NULL,
+    job_title VARCHAR(50) NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    salary DECIMAL(10, 2) CHECK (salary > 0), -- Validation: Salary must be positive
+    manager_id INT,
+    termination_date DATE,
+    -- Validation: Ensures termination happens AFTER hiring
+    CONSTRAINT chk_term_date CHECK (termination_date IS NULL OR termination_date >= hire_date)
+);
+
+
+INSERT INTO employees VALUES
+(101, 'Alice', 'Smith', 'alice.smith@company.com', '2018-03-15', 'HR Director', 'Human Resources', 95000.00, NULL, NULL),
+(102, 'Bob', 'Johnson', 'bob.johnson@company.com', '2020-06-01', 'Senior Developer', 'Engineering', 115000.00, 105, NULL),
+(103, 'Charlie', 'Brown', '://browncompany.com', '2021-11-10', 'QA Engineer', 'Engineering', 65000.00, 102, NULL), -- Invalid Email
+(104, 'Diana', 'Prince', 'diana.prince@company.com', '2019-01-10', 'VP of Engineering', 'Engineering', 160000.00, NULL, NULL),
+(105, 'Evan', 'Wright', 'evan.wright@company.com', '2023-02-01', 'Engineering Manager', 'Engineering', 130000.00, 104, NULL),
+(106, 'Fiona', 'Gallagher', 'fiona.g@company.com', '2022-05-15', 'HR Assistant', 'Human Resources', 45000.00, 101, '2021-04-12'), -- Invalid Term Date
+(107, 'George', 'Clark', 'george.clark@company.com', '2015-08-20', 'CEO', 'Executive', 250000.00, NULL, NULL),
+(108, 'Hannah', 'Davis', 'hannah.davis@company.com', '2024-01-15', 'Junior Developer', 'Engineering', -5000.00, 105, NULL), -- Invalid Negative Salary
+(109, 'Ian', 'Malcolm', 'ian.m@company.com', '2020-07-01', 'Data Scientist', 'Analytics', 105000.00, 107, NULL),
+(110, 'Julia', 'Roberts', 'julia.roberts@company.com', '2021-03-12', 'Recruiter', 'Human Resources', 55000.00, 101, NULL);
+
+SELECT employee_id, first_name, last_name, email
+FROM employees
+WHERE email NOT LIKE '%@%.%' 
+   OR email LIKE '% %'; -- Catches spaces inside emails
+   
+SELECT employee_id, first_name, last_name, hire_date, termination_date
+FROM employees
+WHERE termination_date IS NOT NULL 
+  AND termination_date < hire_date;
+  
+SELECT employee_id, first_name, last_name, job_title, salary
+FROM employees
+WHERE salary <= 0 
+   OR salary IS NULL;
+   
+SELECT e.employee_id, e.first_name, e.last_name, e.manager_id
+FROM employees e
+WHERE e.manager_id IS NOT NULL 
+  AND e.manager_id NOT IN (SELECT employee_id FROM employees);
+  
+  SELECT 
+    department,
+    COUNT(employee_id) AS staff_count,       -- Row count per department
+    MIN(salary) AS department_min_salary,     -- Minimum salary in this department
+    MAX(hire_date) AS most_recent_hire        -- Latest hire in this department
+FROM employees
+GROUP BY department
+ORDER BY staff_count DESC;                    -- Organizes output by largest department first
+
+SELECT employee_id, first_name, last_name, department, salary
+FROM employees
+WHERE salary = (SELECT MIN(salary) FROM employees);
+
+SELECT employee_id, first_name, last_name, department, hire_date
+FROM employees
+WHERE hire_date = (SELECT MAX(hire_date) FROM employees);
+
+
